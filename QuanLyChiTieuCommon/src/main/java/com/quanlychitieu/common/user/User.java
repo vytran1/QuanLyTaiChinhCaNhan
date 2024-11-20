@@ -41,7 +41,8 @@ public class User {
 	@Column(name = "lang", columnDefinition = "enum('vn','us') default 'vn'")
 	private Language lang = Language.vn;
 	
-	
+	@Column(name = "reset_password_token")
+	private String resetPasswordToken;
 
 	public User() {
 		super();
@@ -142,6 +143,18 @@ public class User {
 
 	public void setLang(Language lang) {
 		this.lang = lang;
+	}
+
+    
+
+	public String getResetPasswordToken() {
+		return resetPasswordToken;
+	}
+
+
+
+	public void setResetPasswordToken(String resetPasswordToken) {
+		this.resetPasswordToken = resetPasswordToken;
 	}
 
 

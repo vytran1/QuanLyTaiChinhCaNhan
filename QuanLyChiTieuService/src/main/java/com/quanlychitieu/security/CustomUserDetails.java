@@ -2,12 +2,11 @@ package com.quanlychitieu.security;
 
 import java.util.Collection;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.quanlychitieu.common.user.User;
-import com.quanlychitieu.user.UserRepository;
+
 
 public class CustomUserDetails implements UserDetails {
     
