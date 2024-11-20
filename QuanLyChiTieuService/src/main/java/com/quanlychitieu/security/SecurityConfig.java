@@ -51,7 +51,7 @@ public class SecurityConfig {
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests((auth) -> auth
-				.requestMatchers("/api/quanlychitieu/oauth/**").permitAll()
+				.requestMatchers("/oauth/**").permitAll()
 				.anyRequest().authenticated())
 		    .csrf(csrf -> csrf.disable())
 		.exceptionHandling((exh) -> exh.authenticationEntryPoint((request,response,exception)->{

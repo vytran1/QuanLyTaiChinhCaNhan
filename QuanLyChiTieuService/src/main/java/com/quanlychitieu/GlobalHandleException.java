@@ -75,4 +75,21 @@ public class GlobalHandleException extends ResponseEntityExceptionHandler {
 		LOGGER.error(exception.getMessage(),exception);
 		return error;
 	}
+	
+	@ResponseBody
+	@ExceptionHandler(IllegalArgumentException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorDTO handleIllegalArgumentException(HttpServletRequest request,Exception exception) {
+		
+		
+		ErrorDTO error = new ErrorDTO();
+		error.setTimestamp(new Date());
+		error.setStatus(HttpStatus.BAD_REQUEST.value());
+		error.addError(exception.getMessage());
+		error.setPath(request.getServletPath());
+		
+		LOGGER.error(exception.getMessage(),exception);
+		return error;
+	}
+	
 }
