@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.quanlychitieu.ErrorDTO;
 import com.quanlychitieu.Utility;
 import com.quanlychitieu.common.exception.ApiError;
+import com.quanlychitieu.common.exception.CurrentPasswordMisMatchException;
 import com.quanlychitieu.common.exception.ErrorWhileSavingImageException;
 import com.quanlychitieu.common.exception.UserNotFoundException;
 import com.quanlychitieu.common.user.User;
@@ -39,17 +40,18 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 
-	@GetMapping("")
-	public ResponseEntity<?> loadAllUser() {
-		List<User> users = userService.loadAll();
-		if (users.size() > 0) {
-            System.out.println(users);
-			return ResponseEntity.ok(users);
-		} else {
-			return ResponseEntity.noContent().build();
-		}
-	}
+//	@GetMapping("")
+//	public ResponseEntity<?> loadAllUser() {
+//		List<User> users = userService.loadAll();
+//		if (users.size() > 0) {
+//            System.out.println(users);
+//			return ResponseEntity.ok(users);
+//		} else {
+//			return ResponseEntity.noContent().build();
+//		}
+//	}
 	
+	//Lấy Thông Tin Cá Nhân
 	@GetMapping("/personal_information")
 	public ResponseEntity<?> getPersonalInfo(){
 		Integer currentId = Utility.getIdOfCurrentLoginUser();
@@ -68,7 +70,7 @@ public class UserController {
 		}
 	}
 	
-	
+	//Cập Nhật Thông Tin Cá Nhân
 	@PostMapping("")
 	public ResponseEntity<?> updatePersonalInfo(@RequestBody User userFromRequest){
 		Integer currentLoginUserId = Utility.getIdOfCurrentLoginUser();
@@ -76,7 +78,24 @@ public class UserController {
 		return ResponseEntity.ok().build();
 	}
 	
-	
+	//Đổi Mật Khẩu
+	@PostMapping("/changePassword")
+	public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request){
+		Integer currentLoginUserId = Utility.getIdOfCurrentLoginUser();
+		try {
+			userService.changePassword(currentLoginUserId,request.getCurrentPassword(),request.getNewPassword());
+			return ResponseEntity.status(HttpStatus.OK).build();
+		} catch (CurrentPasswordMisMatchException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			ErrorDTO errorDTO = new ErrorDTO();
+			errorDTO.setStatus(HttpStatus.BAD_REQUEST.value());
+			errorDTO.setTimestamp(new Date());
+			errorDTO.addError(e.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDTO);
+		}
+		
+	}
 	
 	
 	
