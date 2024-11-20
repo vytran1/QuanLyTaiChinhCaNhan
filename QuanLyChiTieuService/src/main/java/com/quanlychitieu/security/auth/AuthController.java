@@ -98,6 +98,8 @@ public class AuthController {
 	}
 	
 	
+	
+	
 	private void saveImage(User user,MultipartFile file) throws ErrorWhileSavingImageException {
 		if(!file.getContentType().startsWith("image/")) {
 			throw new IllegalArgumentException("Vui Lòng Gửi File Là Ảnh Cho Chúng tôi");
