@@ -51,6 +51,13 @@ public class User {
 
     
 
+	public User(Integer userId) {
+		super();
+		this.userId = userId;
+	}
+
+
+
 	public Integer getUserId() {
 		return userId;
 	}

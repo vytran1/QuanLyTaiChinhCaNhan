@@ -11,12 +11,14 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,6 +41,8 @@ public class GlobalHandleException extends ResponseEntityExceptionHandler {
 		LOGGER.error(ex.getMessage(),ex);
 		return new ResponseEntity(error,headers,status);
 	}
+    
+
 	
 	@ResponseBody
 	@ExceptionHandler(ConstraintViolationException.class)
@@ -91,5 +95,15 @@ public class GlobalHandleException extends ResponseEntityExceptionHandler {
 		LOGGER.error(exception.getMessage(),exception);
 		return error;
 	}
+	
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<?> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+        // Thông báo lỗi khi kiểu dữ liệu không khớp
+        String errorMessage = "Invalid value for parameter '" + ex.getName() + "'. Expected type is " + ex.getRequiredType().getName();
+        ErrorDTO errorDTO = new ErrorDTO();
+        errorDTO.setStatus(HttpStatus.BAD_REQUEST.value());
+        errorDTO.addError(errorMessage);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDTO);
+    }
 	
 }
