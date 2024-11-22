@@ -50,6 +50,25 @@ public class WalletController {
 	}
 	
 	
+	@GetMapping("/{walletId}")
+	public ResponseEntity<?> getSingleWallet(@PathVariable("walletId") Integer walletId){
+		 Integer userId = Utility.getIdOfCurrentLoginUser();
+		 try {
+			Wallet wallet = walletService.findByUserIdAndWalletId(walletId, userId);
+			WalletDTO walletDTO = this.convertEntityToDTO(wallet);
+			return ResponseEntity.ok(walletDTO);
+		} catch (WalletNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			ErrorDTO errorDTO = new ErrorDTO();
+			errorDTO.setStatus(HttpStatus.NOT_FOUND.value());
+			errorDTO.setTimestamp(new Date());
+			errorDTO.addError(e.getMessage());
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDTO);
+		}
+	}
+	
+	
 	//Create Wallet
 	@PostMapping("")
 	public ResponseEntity<?> createWallet(@RequestBody @Valid WalletDTO walletDTO){
@@ -74,8 +93,6 @@ public class WalletController {
 		} catch (WalletNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 			ErrorDTO errorDTO = new ErrorDTO();
 			errorDTO.setStatus(HttpStatus.NOT_FOUND.value());
 			errorDTO.setTimestamp(new Date());
@@ -85,6 +102,7 @@ public class WalletController {
 	}
 	
 	
+	//Update Amount
 	@PostMapping("/{walletId}/update_amount")
 	public ResponseEntity<?> updateOnlyAmount(
 			@PathVariable("walletId") Integer walletId,  
@@ -134,6 +152,41 @@ public class WalletController {
 		}
 	}
 	
+	//Save Many Wallet at one time
+	@PostMapping("/saveAll")
+	public ResponseEntity<?> saveManyWallet(@RequestBody @Valid List<WalletDTO> walletDTOs){
+		Integer userId = Utility.getIdOfCurrentLoginUser();
+		List<Wallet> wallets = walletDTOs.stream().map(this::convertDTOToEntity).toList();
+		for(Wallet wallet : wallets) {
+			wallet.setUser(new User(userId));
+		}
+		walletService.saveManyWallets(wallets);
+		return ResponseEntity.ok().build();
+	}
+	
+	
+	//Update many wallet at one time
+	@PostMapping("/updateAll")
+	public ResponseEntity<?> updateManyWallet(@RequestBody @Valid List<WalletDTO> walletDTOs){
+		Integer userId = Utility.getIdOfCurrentLoginUser();
+		List<Wallet> wallets = walletDTOs.stream().map(this::convertDTOToEntity).toList();
+		for(Wallet wallet : wallets) {
+			wallet.setUser(new User(userId));
+		}
+		walletService.saveManyWallets(wallets);
+		return ResponseEntity.ok().build();
+	}
+	
+	@DeleteMapping("/deleteAll")
+	public ResponseEntity<?> deleteManyWallet(@RequestBody @Valid List<WalletDTO> walletDTOs){
+		Integer userId = Utility.getIdOfCurrentLoginUser();
+		List<Wallet> wallets = walletDTOs.stream().map(this::convertDTOToEntity).toList();
+		for(Wallet wallet : wallets) {
+			wallet.setUser(new User(userId));
+		}
+		walletService.deleteManyWallets(wallets);
+		return ResponseEntity.ok().build();
+	}
 	
 	
 	

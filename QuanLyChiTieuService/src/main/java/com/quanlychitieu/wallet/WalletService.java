@@ -60,4 +60,12 @@ public class WalletService {
 			throw new WalletNotFoundException("Not exist wallet with id: " + walletId + " and User Id: " + userId);
 		}
 	}
+	
+	public void saveManyWallets(List<Wallet> wallets) {
+		walletRepository.saveAll(wallets);
+	}
+	
+	public void deleteManyWallets(List<Wallet> wallets) {
+		walletRepository.deleteAll(wallets);
+	}
 }
