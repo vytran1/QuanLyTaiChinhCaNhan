@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.List;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.quanlychitieu.ErrorDTO;
 import com.quanlychitieu.Utility;
-import com.quanlychitieu.common.exception.ApiError;
+
 import com.quanlychitieu.common.exception.CurrentPasswordMisMatchException;
 import com.quanlychitieu.common.exception.ErrorWhileSavingImageException;
 import com.quanlychitieu.common.exception.UserNotFoundException;

@@ -1,5 +1,8 @@
 package com.quanlychitieu;
 
+import java.util.Date;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.quanlychitieu.common.user.User;
@@ -15,5 +18,13 @@ public class Utility {
 	}
 	
 	
+	
+	public static ErrorDTO createErrorObject(Integer httpStatus,String message) {
+		ErrorDTO errorDTO = new ErrorDTO();
+		errorDTO.setStatus(httpStatus);
+		errorDTO.setTimestamp(new Date());
+		errorDTO.addError(message);
+		return errorDTO;
+	}
 	
 }

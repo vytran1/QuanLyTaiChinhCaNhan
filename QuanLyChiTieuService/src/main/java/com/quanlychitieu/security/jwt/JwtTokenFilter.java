@@ -15,7 +15,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
-import com.quanlychitieu.GlobalHandleException;
+
 import com.quanlychitieu.common.user.User;
 import com.quanlychitieu.security.CustomUserDetails;
 

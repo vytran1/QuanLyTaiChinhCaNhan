@@ -17,4 +17,7 @@ public interface WalletRepository extends JpaRepository<Wallet,Integer> {
 	
 	@Query("SELECT w FROM Wallet w WHERE w.walletId = ?1 AND w.user.userId = ?2")
 	public Optional<Wallet> findByUserIdAndWalletId(Integer walletId,Integer userId);
+	
+	
+	
 }
