@@ -57,7 +57,9 @@ public class SecurityConfig {
 		.exceptionHandling((exh) -> exh.authenticationEntryPoint((request,response,exception)->{
 			exception.printStackTrace();
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,exception.getMessage());
-		})).addFilterBefore(jwtTokenFilter,AuthorizationFilter.class);
+		}))
+		.oauth2Login(oauth2 -> oauth2.permitAll())
+		.addFilterBefore(jwtTokenFilter,AuthorizationFilter.class);
 		return http.build();
 	}
 }

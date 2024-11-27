@@ -3,10 +3,12 @@ package com.quanlychitieu.security.auth;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-
+import java.util.Collections;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,17 +28,22 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.quanlychitieu.SendMailUtility;
 
 import com.quanlychitieu.common.exception.ApiError;
 import com.quanlychitieu.common.exception.ErrorWhileSavingImageException;
 import com.quanlychitieu.common.exception.UserAlreadyExistException;
 import com.quanlychitieu.common.exception.UserNotFoundException;
+import com.quanlychitieu.common.user.AuthenticationType;
 import com.quanlychitieu.common.user.Currency;
 import com.quanlychitieu.common.user.Language;
 import com.quanlychitieu.common.user.User;
 import com.quanlychitieu.security.CustomUserDetails;
+import com.quanlychitieu.user.UserRepository;
 import com.quanlychitieu.user.UserService;
 
 import jakarta.mail.MessagingException;
@@ -49,18 +56,28 @@ public class AuthController {
     
 	//private final static String defaultImage = "D:\\quanlychitieu_images\\anomyus.jpg";
 	
-
+	@Value("${spring.security.oauth2.client.registration.google.client-id}") 
+	private String googleClientId; 
+	
+	@Value("${spring.security.oauth2.client.registration.google.client-secret}") 
+	private String googleClientSecret;
 	
 	
 	
 	@Autowired
 	AuthenticationManager authenticationManager;
 	
+	
+	
+	
 	@Autowired
 	TokenService tokenService;
 	
 	@Autowired
 	UserService userService;
+	
+	
+	
 	
 	@PostMapping("/token")
 	public ResponseEntity<?> getAccessToken(@RequestBody @Valid AuthRequest request){
@@ -75,6 +92,40 @@ public class AuthController {
 			return ResponseEntity.ok(authResponse);
 		}catch(BadCredentialsException e) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+		}
+	}
+	
+	
+	@PostMapping("/google")
+	public ResponseEntity<?> loginGoogle(@RequestBody Map<String,String> request){
+		String idToken = request.get("idToken");
+		
+		try {
+			
+			GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier
+					.Builder(new NetHttpTransport(), JacksonFactory.getDefaultInstance())
+					.setAudience(Collections.singletonList(googleClientId))
+					.build(); 
+			
+			GoogleIdToken googleIdToken;
+			googleIdToken = verifier.verify(idToken);
+			GoogleIdToken.Payload payLoadData = googleIdToken.getPayload();
+			String email = payLoadData.getEmail();
+			User user = userService.findByEmailForGoogleLogin(email);
+			if(user == null) {
+				user = new User();
+				user.setEmail(email);
+				user.setFirstName((String) payLoadData.get("given_name"));
+				user.setLastName((String) payLoadData.get("family_name"));
+				user.setPhoto("Photo.png");
+				user.setAuthenticationType(AuthenticationType.valueOf("GOOGLE"));
+			}
+			user.setAuthenticationType(AuthenticationType.GOOGLE);
+			User savedUser = userService.saveUser(user);
+			AuthResponse authResponse = tokenService.generateToken(savedUser);
+			return ResponseEntity.ok(authResponse);
+		}catch(GeneralSecurityException | IOException e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
 	}
 	

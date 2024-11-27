@@ -56,6 +56,16 @@ public class UserService {
 	}
 	
 	
+	public User findByEmailForGoogleLogin(String email) {
+		Optional<User> user = this.userRepository.findByUsername(email);
+		if(!user.isPresent()) {
+			return null;
+		}else {
+			return user.get();
+		}
+	}
+	
+	
 	public String updateForgotPasswordToken(String email) throws UserNotFoundException {
 		Optional<User> user = this.userRepository.findByUsername(email);
 		if(!user.isPresent()) {

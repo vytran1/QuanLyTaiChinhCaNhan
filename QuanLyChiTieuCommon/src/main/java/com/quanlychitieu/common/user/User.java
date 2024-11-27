@@ -41,6 +41,12 @@ public class User {
 	@Column(name = "lang", columnDefinition = "enum('vn','us') default 'vn'")
 	private Language lang = Language.vn;
 	
+	
+	@Enumerated(EnumType.STRING)
+	@Column(name = "authentication_type", columnDefinition =  "enum('DATABASE','GOOGLE') default 'DATABASE'")
+	private AuthenticationType authenticationType;
+	
+	
 	@Column(name = "reset_password_token")
 	private String resetPasswordToken;
 
@@ -162,6 +168,18 @@ public class User {
 
 	public void setResetPasswordToken(String resetPasswordToken) {
 		this.resetPasswordToken = resetPasswordToken;
+	}
+
+    
+
+	public AuthenticationType getAuthenticationType() {
+		return authenticationType;
+	}
+
+
+
+	public void setAuthenticationType(AuthenticationType authenticationType) {
+		this.authenticationType = authenticationType;
 	}
 
 
